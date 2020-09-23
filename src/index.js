@@ -3,26 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 class Square extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      value : this.props.value
-    }
-  }
-// adding a comment
-  squareClickHandler = () =>{
-    this.setState({
-      value : this.state.value +1,
-    });
-    this.props.onClickker();
-  }
   render() {
     //Forgetting () => and writing onClick={alert('click')} is a common mistake
     return (
       <button className="square" 
-        onClick = {() => this.squareClickHandler()}>
-        {this.state.value}
+        onClick = {this.props.onClickker}>          
+        {this.props.value}
       </button>
+      //onClick = {()=>this.props.onClickker(1)}
     );
   }
 }
@@ -31,27 +19,30 @@ class Board extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      turn : 'X'
+      turn : 'X',
+      squares : Array(9).fill(null),
     }
   }
 
-  clickMe = ()=>{
-    console.log("clickedme");
+  clickMe = (i)=>{ 
+    console.log("TURN "+ this.state.turn )   
+    const squares = this.state.squares.slice();
+    squares[i] = this.state.turn;
+    const turn = this.state.turn === 'X'? 'O' : 'X';
+    console.log("squares "+ squares )
     this.setState({
-      turn : this.state.turn === 'X'? 'O' : 'X',
-    })
+      squares: squares,
+      turn : turn});
+    
   }
 
   renderSquare(i) {
-    return <Square value={i} onClickker={()=> this.clickMe()}/>;
+    return <Square value={this.state.squares[i]} onClickker={()=> this.clickMe(i)}/>;
+    //onClickker={(k)=> this.clickMe(i)
   }
 
   render() {
-    //const turn = this.state.turn === 'X'? 'O' : 'X'
     const status = 'Next player: ' + this.state.turn;
-    // this.setState({
-    //   turn : this.turn,
-    // })
     return (
       <div>
         <div className="status">{status}</div>

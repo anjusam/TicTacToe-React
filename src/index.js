@@ -9,7 +9,7 @@ class Square extends React.Component {
       value : this.props.value
     }
   }
-
+// adding a comment
   squareClickHandler = () =>{
     this.setState({
       value : this.state.value +1,

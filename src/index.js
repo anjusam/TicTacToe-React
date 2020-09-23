@@ -10,7 +10,6 @@ class Square extends React.Component {
         onClick = {this.props.onClickker}>          
         {this.props.value}
       </button>
-      //onClick = {()=>this.props.onClickker(1)}
     );
   }
 }
@@ -21,28 +20,63 @@ class Board extends React.Component {
     this.state = {
       turn : 'X',
       squares : Array(9).fill(null),
+      gameWon: false,
     }
   }
 
   clickMe = (i)=>{ 
-    console.log("TURN "+ this.state.turn )   
-    const squares = this.state.squares.slice();
-    squares[i] = this.state.turn;
-    const turn = this.state.turn === 'X'? 'O' : 'X';
-    console.log("squares "+ squares )
-    this.setState({
-      squares: squares,
-      turn : turn});
-    
+    if(!this.state.gameWon){
+       if(this.findWinner()){
+      // this.setState({
+      //   gameWon : true,
+      // });
+      console.log('found winner');
+       }
+      console.log("TURN "+ this.state.turn )   
+      const squares = this.state.squares.slice();
+      squares[i] = this.state.turn;
+      const turn = this.state.turn === 'X'? 'O' : 'X';
+      console.log("squares "+ squares )
+      this.setState({
+        squares: squares,
+        turn : turn});
+    }  
+   // }
+      
+  }
+
+  findWinner = () => {
+    let squares = this.state.squares;
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for ( let i = 0; i< lines.length; i++ ){
+      var [a,b,c] = lines[i];
+      if(squares[a] && squares[a] === squares[b] && squares[a] ===squares[c]){        
+        // updating the state within a render function will create infinte loops.
+        // this.setState({
+        //   gameWon : true,
+        // });
+        return 'Winner '+ (this.state.turn === 'X'? 'O' : 'X');
+      }        
+    }
+    return 'Next player: ' + this.state.turn;
   }
 
   renderSquare(i) {
     return <Square value={this.state.squares[i]} onClickker={()=> this.clickMe(i)}/>;
-    //onClickker={(k)=> this.clickMe(i)
   }
 
   render() {
-    const status = 'Next player: ' + this.state.turn;
+    console.log(this.findWinner());
+    const status = this.findWinner();
     return (
       <div>
         <div className="status">{status}</div>

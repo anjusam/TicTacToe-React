@@ -2,16 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends React.Component {
-  render() {
+function Square(props) {
     //Forgetting () => and writing onClick={alert('click')} is a common mistake
+    // change to function component when the function has no state of its own
     return (
       <button className="square" 
-        onClick = {this.props.onClickker}>          
-        {this.props.value}
+        onClick = {props.onClickker}>          
+        {props.value}
       </button>
     );
-  }
 }
 
 class Board extends React.Component {
@@ -20,32 +19,31 @@ class Board extends React.Component {
     this.state = {
       turn : 'X',
       squares : Array(9).fill(null),
-      gameWon: false,
+      //gameWon: false,
     }
   }
 
-  clickMe = (i)=>{ 
-    if(!this.state.gameWon){
-       if(this.findWinner()){
-      // this.setState({
-      //   gameWon : true,
-      // });
-      console.log('found winner');
-       }
-      console.log("TURN "+ this.state.turn )   
+  clickMe = (i)=>{     
       const squares = this.state.squares.slice();
-      squares[i] = this.state.turn;
-      const turn = this.state.turn === 'X'? 'O' : 'X';
-      console.log("squares "+ squares )
-      this.setState({
-        squares: squares,
-        turn : turn});
-    }  
-   // }
+      if(!this.findWinner() && !squares[i] ){
+        squares[i] = this.state.turn;
+        console.log('new squares' + squares);
+        const turn = this.state.turn === 'X'? 'O' : 'X';
+        this.setState({
+          squares: squares,
+          turn : turn});
+          // the squares in the 2 consoles in this function do not match until this function finsihes execution
+          // becasue of immutability.
+          // iff chamged to => const squares = this.state.squares
+          // the 2 consoles will be same
+          console.log('updated squares', this.state.squares)
+
+      }
       
   }
 
   findWinner = () => {
+    //console.log('squares ' + this.state.squares); 
     let squares = this.state.squares;
     const lines = [
       [0, 1, 2],
@@ -60,14 +58,14 @@ class Board extends React.Component {
     for ( let i = 0; i< lines.length; i++ ){
       var [a,b,c] = lines[i];
       if(squares[a] && squares[a] === squares[b] && squares[a] ===squares[c]){        
-        // updating the state within a render function will create infinte loops.
+        // updating the state within a render function will create infinte loops
         // this.setState({
         //   gameWon : true,
         // });
-        return 'Winner '+ (this.state.turn === 'X'? 'O' : 'X');
+        return true;
       }        
     }
-    return 'Next player: ' + this.state.turn;
+    return false;
   }
 
   renderSquare(i) {
@@ -75,8 +73,13 @@ class Board extends React.Component {
   }
 
   render() {
-    console.log(this.findWinner());
-    const status = this.findWinner();
+    let winner = this.findWinner();
+    let status;
+    if(winner){
+      status = 'Winner '+ (this.state.turn === 'X'? 'O' : 'X');
+    }else{
+      status = 'Next player: ' + this.state.turn;
+    }
     return (
       <div>
         <div className="status">{status}</div>
